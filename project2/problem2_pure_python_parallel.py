@@ -20,7 +20,7 @@ beta_array = np.linspace(beta_min, beta_max, N_beta)
 susceptibility_array = []
 susceptibility_error_array = []
 
-num_trials = 50# Monte-Carlo try number
+num_trials = 100000# Monte-Carlo try number
 block_size = 50
 
 def simulation(beta):
@@ -39,10 +39,12 @@ def simulation(beta):
         old_grid = worm_algorithm.get_pathed_grid()
         new_grid = worm_algorithm.update_grid(old_grid)
         worm_algorithm.set_pathed_grid(new_grid)
+        if counter%int(num_trials/1000)==0:
+            print("beta:", beta, "--", round(counter/num_trials*100, 3),"%")
 
     susceptibility_array.append(np.average(num_winding_square_Monte_Carlo) / (N * beta))
     data = np.array([num_particles_Monte_Carlo, energy_Monte_Carlo, num_winding_square_Monte_Carlo]).transpose()
-    pd.DataFrame(data).to_csv("beta_"+str(beta)+"_test_parallel.csv", index=False, header=["n", "e_tilda", "w^2"])
+    pd.DataFrame(data).to_csv("beta_"+str(beta)+"_test_parallel(1).csv", index=False, header=["n", "e_tilda", "w^2"])
     print('-----------------------beta = %.3f done-----------------------------' % beta)
     return None
 
@@ -54,10 +56,3 @@ if __name__ == "__main__":
     finish_time = time.perf_counter()
     print("Program finished in {} seconds - using multiprocessing".format(finish_time-start_time))
     print("---")
-
-    start_time = time.perf_counter()
-    for beta in beta_array:
-        blank = simulation(beta)
-    finish_time = time.perf_counter()
-    print("Program finished in {} seconds".format(finish_time-start_time))
-
