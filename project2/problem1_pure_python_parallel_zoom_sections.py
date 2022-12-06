@@ -65,18 +65,16 @@ if __name__ == "__main__":
         all_parameters.append(parameters)
     print("Starting Simulation")
         
-    all_data = []
+    all_data = np.array([[],[],[],[]])
     parallel_computing_size = 10
     
     for jj in range(int((N_mu) / parallel_computing_size)):
         with Pool() as pool:
             data = pool.map(simulation, all_parameters[parallel_computing_size * jj : parallel_computing_size * (jj + 1)])
-        all_data.append(data)
+        all_data = np.append(all_data, data)
         
     data2 = np.reshape(all_data, (N_mu * num_trials, 4))
     
-    print("----------data------------------")
-    print(data2)
     print("writing data")
     pd.DataFrame(data2).to_csv("problem1data_zoomed.csv", index=False, header=["mu", "n", "e_tilda", "w^2"])
 

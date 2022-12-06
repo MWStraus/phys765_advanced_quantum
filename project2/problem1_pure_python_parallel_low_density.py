@@ -48,21 +48,19 @@ if __name__ == "__main__":
     beta = 100
     mu_array = np.linspace(mu_min, mu_max, N_mu)
 
-    num_trials = int(30e3)# Monte-Carlo try number
+    num_trials = 30000# Monte-Carlo try number
     print("got parameters")
     all_parameters = []
     for mu in mu_array:
         parameters = [ N, mu, epsilon, beta, dimension, num_trials]
         all_parameters.append(parameters)
     print("Starting Simulation")
-    all_data = []
+    all_data = np.array([[],[],[],[]])
     for jj in range(30):
         with Pool() as pool:
             data = pool.map(simulation, all_parameters[10*jj:10*jj+10])
-        all_data.append(data)
-    data2 = np.reshape(all_data, (N_mu*num_trials, 4))
-    print("----------data------------------")
-    print(data2)
+        all_data = np.append(all_data, data)
+    data2 = np.reshape(np.array(all_data), (N_mu*num_trials, 4))
     print("writing data")
     pd.DataFrame(data2).to_csv("problem1data.csv", index=False,
                               header=["mu", "n", "e_tilda", "w^2"])
