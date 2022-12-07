@@ -57,7 +57,7 @@ if __name__ == "__main__":
     mu_array = np.append(mu_array, mu_zoom_3)
         
     num_trials = 30000 # Monte-Carlo try number
-    print("got parameters")
+    print("Got parameters")
     all_parameters = []
     
     for mu in mu_array:
@@ -68,14 +68,23 @@ if __name__ == "__main__":
     all_data = np.array([[],[],[],[]])
     parallel_computing_size = 10
     
+    
     for jj in range(int((N_mu) / parallel_computing_size)):
         with Pool() as pool:
             data = pool.map(simulation, all_parameters[parallel_computing_size * jj : parallel_computing_size * (jj + 1)])
         all_data = np.append(all_data, data)
         
-    data2 = np.reshape(all_data, (N_mu * num_trials, 4))
+    #print(all_data)
     
-    print("writing data")
-    pd.DataFrame(data2).to_csv("problem1data_zoomed.csv", index=False, header=["mu", "n", "e_tilda", "w^2"])
+    for i in range(len(mu_array)):
+        mu = mu_array[i]
+
+        partial_data = all_data[4 * num_trials * i: 4 * num_trials * (i + 1)]
+        partial_data_reshape = np.reshape(partial_data, (num_trials, 4))
+        
+        filename = "problem1data\\zoomed_mu=%.3f.csv" %mu
+        pd.DataFrame(partial_data_reshape).to_csv(filename, index=False, header=["mu", "n", "e_tilda", "w^2"])
+    
+    print("Data writing complete")
 
 
